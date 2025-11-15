@@ -81,12 +81,12 @@ colnames(ReadCounts)
 # provide little evidence for differential expression. Step required by the
 # EdgeR package, DESeq2 has its own internal filtering process, done for 
 # all the analysis for comparison)
-table(rowSums(ReadCounts)==0) #count the number of genes expressed in none of the samples
+table(rowSums(ReadCounts)==0) #counts the number of genes expressed in none of the samples
 
 # A good threshold can be chosen by identifying the CPM (Count Per 
 # million calculated by the EdgeR package) 
 # that corresponds to a count of 10
-cpm(10, mean(colSums(ReadCounts))) #tiens en compte la taille des librairies en terme de reads mappes
+cpm(10, mean(colSums(ReadCounts))) #tient en compte la taille des librairies en terme de reads mappes
 # discard low counts entries (count must be sufficient in at least two 
 # samples)
 
@@ -94,8 +94,8 @@ cutoff <- 0.8000456
 #keep <- rowSums(cpm(ReadCounts)>cutoff) >= 2
 keep <- rowSums(cpm(ReadCounts)>10) >= 2
 summary(keep)
-ReadCounts <- ReadCounts[keep,] # on garde uniquement les genes respectant la condition
-# permet d'enlever les genes qui sont trop faiblement exprimes
+ReadCounts <- ReadCounts[keep,] # on garde uniquement les gènes respectant la condition
+# permet d'enlever les gènes qui sont trop faiblement exprimés
 dim(ReadCounts)
 class(ReadCounts)
 names(ReadCounts)
@@ -115,7 +115,7 @@ boxplot(ReadCounts,
 
 #============== Differential Expression Gene Analysis ==================
 
-# In our data set, we want to identify the genes differentially between the different groups
+# In our data set, we want to identify the genes differentially expressed between the different groups
 # TODO : chose a reference group (first-level factor)
 
 
@@ -225,7 +225,7 @@ hist(topresults.DESeq2$log2FoldChange,
 # investigate  library  sizes
 colSums(counts(DESeq.ds))
 
-# normalisation des donnees en faisant le logarithme des donnees sur la taille des librairies
+# normalisation des données en faisant le logarithme des données sur la taille des librairies
 
 # calculate  the  size  factors (for library size normalization)
 DESeq.ds <- estimateSizeFactors(DESeq.ds) #facteur correctif qui tient compte de la taille de la librairie
@@ -233,7 +233,7 @@ DESeq.ds@colData$sizeFactor
 
 # make a data.frame  with meta-data  where  row.names  should  match  the  individual sample  names
 # group provides informations about replicates, ind identifies uniquely each library, sex and dev allow to test for different effects
-# in practive here we will only test for differences between groups, but it is useful to know that it is possible to test for sex only or dev stage only, or for the effect of both
+# in practice here we will only test for differences between groups, but it is useful to know that it is possible to test for sex only or dev stage only, or for the effect of both
 # TODO group = () : to complete with /data/share/MADT/TP_hbadouin/2020-2021/count_matrix/samples_decription.lst
 # Replicates must have the same group identifier, so that the package can use them to estimate dispersion
 
@@ -242,16 +242,16 @@ DESeq.ds@colData$sizeFactor
 # PCA and clustering should be done on normalized and preferably transformed read counts, so
 # that the high variability of read counts does not occlude potentially informative data trends
 
-# Here I used the regularized log-transformation of the DESeq2 package that reduce variance 
+# Here I used the regularized log-transformation of the DESeq2 package that reduces variance 
 # of low read counts by using the dispestion-mean trend seen for the entire data set as a reference
-# permettent de recuperer les valeurs normalises par DESeq
+# permettent de récupérer les valeurs normalisées par DESeq
 rld <- rlog(DESeq.ds, blind = FALSE)
 rlog.norm.counts <- assay(rld)
 
 # Read count correlations
 # we compute 1 minus the correlation of read counts to obtain a distance
-# cor permet de calculer la correlation entre les librairies via le coef de correlation de Pearson
-# on calcule la distance car cela permet de faire du clastering d=0 "identiques"  d=1 "aucune similarite"
+# cor permet de calculer la corrélation entre les librairies via le coef de corrélation de Pearson
+# on calcule la distance car cela permet de faire du clustering d=0 "identiques"  d=1 "aucune similarite"
 distance.m_rlog  <- as.dist(1 - cor(rlog.norm.counts , method = "pearson" ))
 
 # we use the distance to perform a hierarchical clustering and plot the resulting tree
@@ -269,7 +269,7 @@ P + theme_bw() + ggtitle("Rlog transformed counts")
 #P <- plotPCA(rld, intgroup = "sex")
 #P + theme_bw() + ggtitle("Rlog transformed counts")
 
-# PC1 distingue les etapes du dev et PC2 separe les hermaphordites du reste
+# PC1 distingue les étapes du dev et PC2 sépare les hermaphordites du reste
 #P <- plotPCA(rld, intgroup = "dev")
 #P + theme_bw() + ggtitle("Rlog transformed counts")
 
